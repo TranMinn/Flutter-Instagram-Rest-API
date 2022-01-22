@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -5,7 +7,8 @@ import 'package:instagram_clone/helper/image_processing.dart';
 import 'package:instagram_clone/screens/upload_post_screen.dart';
 
 class UploadImageScreen extends StatefulWidget {
-  const UploadImageScreen({Key? key}) : super(key: key);
+  final String username, password;
+  const UploadImageScreen({Key? key, required this.username, required this.password}) : super(key: key);
 
   @override
   _UploadImageScreenState createState() => _UploadImageScreenState();
@@ -39,7 +42,7 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => UploadScreen(
-                            pickedFile: pickedFile,
+                            pickedFile: File(pickedFile!.path), username: widget.username, password: widget.password,
                           )));
             },
             child: const Padding(
@@ -64,7 +67,7 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
                   onTap: () async {
                     pickedFile = await imageProcessing.pickPhoto('Gallery');
                   },
-                  child: Text(
+                  child: const Text(
                     'Gallery',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
@@ -77,13 +80,13 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
                     height: 50,
                     width: 50,
                     child: Padding(
-                      padding: EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
                       child: SvgPicture.asset(
                         'assets/icons/instagram_camera_icon.svg',
                         width: 20,
                       ),
                     ),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.grey,
                     ),

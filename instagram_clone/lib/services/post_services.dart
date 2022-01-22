@@ -1,76 +1,93 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:instagram_clone/global_constants.dart';
-import 'package:instagram_clone/models/PostComment.dart';
-import 'package:instagram_clone/models/UserPost.dart';
-import 'package:instagram_clone/models/User.dart';
+import 'package:instagram_clone/models/MyUserData.dart';
+import 'package:instagram_clone/models/PostData.dart';
 
 import 'package:instagram_clone/services/api_services.dart';
 
 class PostService {
-
   // Upload a post
-  Future<PostData> uploadPost(
-      MyUserData myUserData, postPhotoUrl, caption) async {
+  // photo has type File
+  Future<PostData> uploadPost(File image, text, username, password) async {
+    // Map body = {
+    //   'photo': postPhotoUrl,
+    //   'text': text,
+    // };
+
+    // final responseBody = await ApiServices.consumeCreateWithCre(
+    //     API_POST, body, username, password);
+
+    // final responseBody = await ApiServices.consumeCreateWithImage(API_POST, text, image, username, password);
+    // return PostData.fromJson(responseBody);
+
     Map body = {
-      'userId': myUserData.userId,
-      'postPhotoUrl': postPhotoUrl,
-      'caption': caption,
-      'time': DateTime.now(),
-      'postOwnerName': myUserData.username,
-      'postOwnerPhotoUrl': myUserData.profile_pic
+      'text': text,
+      'photo': image != null ? base64Encode(image.readAsBytesSync()) : ''
     };
 
-    final responseBody = await ApiServices.consumeCreate(API_POST, body);
+    final responseBody = await ApiServices.consumeCreateWithCre(
+        API_POST, body, username, password);
+
     return PostData.fromJson(responseBody);
   }
 
   // Get list posts feed
   Future<List<PostData>> getListPosts() async {
-    final responseBody = await ApiServices.consumeGetAll(API_FEED);
-    List<PostData> listPosts =
-        responseBody.map((dynamic item) => PostData.fromJson(item)).toList();
+    final responseBody = await ApiServices.consumeGetAll(API_POST);
+    List<PostData> listPosts = (responseBody['results'] as List)
+        .map((item) => PostData.fromJson(item))
+        .toList();
     return listPosts;
   }
 
   // Upload a comment
-  Future<PostComment> uploadPostComment(
-      MyUserData myUserData, String postId, String text) async {
-    String api_comment = '$MAIN_URL/$postId';
+  Future<Post_comments> uploadPostComment(
+      String postId, String text, username, password) async {
+    String apiUrl = '$API_COMMENT$postId/';
     Map body = {
-      'postId': postId,
       'text': text,
-      'username': myUserData.username,
-      'userPhotoUrl': myUserData.profile_pic,
-      'time': DateTime.now()
     };
 
-    final responseBody = await ApiServices.consumeCreate(api_comment, body);
-    return PostComment.fromJson(responseBody);
+    final responseBody = await ApiServices.consumeCreateWithCre(
+        apiUrl, body, username, password);
+    return Post_comments.fromJson(responseBody);
   }
 
   // Get post comments
-  Future<List<PostComment>> getPostComments(String postId) async {
-    String api_comment = '$MAIN_URL/$postId';
-    final responseBody = await ApiServices.consumeGetAll(api_comment);
-    List<PostComment> listPostComments =
-        responseBody.map((dynamic item) => PostComment.fromJson(item)).toList();
+  Future<List<Post_comments>> getPostComments(String postId) async {
+    String apiUrl = '$API_POST$postId/';
+    final responseBody = await ApiServices.consumeGetAll(apiUrl);
+    List<Post_comments> listPostComments =
+        (responseBody['post_comments'] as List)
+            .map((item) => Post_comments.fromJson(item))
+            .toList();
     return listPostComments;
   }
 
-  // Get user posts
-
   // Get post by id
   Future<PostData> getPostById(String postId) async {
-    final String api_post = '$MAIN_URL/api/post/$postId';
-    final responseBody = await ApiServices.consumeGetOne(api_post);
+    final String apiUrl = '$API_POST$postId/';
+
+    final responseBody = await ApiServices.consumeGetOne(apiUrl);
     return PostData.fromJson(responseBody);
   }
 
   // Like post
-  Future likePost(String postId, String userId, List likes) async {
-    final String api_like = '$API_LIKE/$postId';
+  Future<bool> likePost(String postId, String username, String password) async {
+    final String apiUrl = '$API_LIKE$postId';
 
-    Map body = {'postId': postId, 'userId': userId, 'likes': likes};
+    final response =
+        await ApiServices.consumeGetOneWithCre(apiUrl, username, password);
+    return response['like'];
+  }
 
-    await ApiServices.consumeCreate(api_like, body);
+  // Get likers
+  Future<MyUserData> getLikers(String postId) async {
+    final String apiUrl = '$API_POST$postId/get-likers/';
+
+    final response = await ApiServices.consumeGetOne(apiUrl);
+    return MyUserData.fromJson(response['results']);
   }
 }

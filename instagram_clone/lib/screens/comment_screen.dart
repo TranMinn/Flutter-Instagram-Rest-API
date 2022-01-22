@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/PostComment.dart';
-import 'package:instagram_clone/models/User.dart';
-import 'package:instagram_clone/models/UserPost.dart';
+import 'package:instagram_clone/models/MyUserData.dart';
+import 'package:instagram_clone/models/PostData.dart';
 import 'package:instagram_clone/view_models/comment_viewModel.dart';
 import 'package:instagram_clone/view_models/account_viewModel.dart';
 import 'package:instagram_clone/widgets/comment_line.dart';
 
 class CommentScreen extends StatefulWidget {
   final PostData postData;
-  const CommentScreen({Key? key, required this.postData}) : super(key: key);
+  final String username, password;
+  const CommentScreen({Key? key, required this.postData, required this.username, required this.password}) : super(key: key);
 
   @override
   _CommentScreenState createState() => _CommentScreenState();
@@ -25,7 +25,7 @@ class _CommentScreenState extends State<CommentScreen> {
     PostData widgetPost = widget.postData;
 
     return FutureBuilder<MyUserData?>(
-        future: accountViewModel.fetchCurrentUserData,
+        future: accountViewModel.fetchCurrentUserData(widget.username, widget.password),
         builder: (context, snapshot) {
           MyUserData? myUserData = snapshot.data;
 
@@ -69,7 +69,7 @@ class _CommentScreenState extends State<CommentScreen> {
                       children: [
                         CircleAvatar(
                           backgroundImage:
-                              NetworkImage(widgetPost.postOwnerPhotoUrl!),
+                              NetworkImage(widgetPost.author!.profilePic!),
                           radius: 18,
                         ),
                         Expanded(
@@ -83,13 +83,13 @@ class _CommentScreenState extends State<CommentScreen> {
                                   text: TextSpan(
                                     children: [
                                       TextSpan(
-                                          text: '${widgetPost.postOwnerName}',
+                                          text: '${widgetPost.author!.username}',
                                           style: const TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold,
                                           )),
                                       TextSpan(
-                                        text: ' ${widgetPost.caption}',
+                                        text: ' ${widgetPost.text}',
                                         style: const TextStyle(
                                             color: Colors.black),
                                       ),
@@ -117,16 +117,16 @@ class _CommentScreenState extends State<CommentScreen> {
                     color: Colors.grey[300],
                     thickness: 1,
                   ),
-                  FutureBuilder<List<PostComment>>(
+                  FutureBuilder<List<Post_comments>>(
                       future: commentViewModel
-                          .fetchListPostComment(widgetPost.postId!),
+                          .fetchListPostComment(widgetPost.id!),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
                           print(snapshot.error);
                         }
 
                         if (snapshot.hasData) {
-                          final List<PostComment> comments = snapshot.data!;
+                          final List<Post_comments> comments = snapshot.data!;
                           return ListView.builder(
                             shrinkWrap: true,
                             itemCount: comments.length,
@@ -151,7 +151,7 @@ class _CommentScreenState extends State<CommentScreen> {
                     children: [
                       CircleAvatar(
                         backgroundImage:
-                            NetworkImage(myUserData?.profile_pic ?? ''),
+                            NetworkImage(myUserData?.profilePic ?? ''),
                         radius: 18,
                       ),
                       Expanded(
@@ -171,8 +171,8 @@ class _CommentScreenState extends State<CommentScreen> {
                         onTap: () async {
                           if (commentController.text.isNotEmpty) {
                             await commentViewModel
-                                .uploadComment(myUserData!, widgetPost.postId!,
-                                    commentController.text)
+                                .uploadComment(widgetPost.id!,
+                                    commentController.text, widget.username, widget.password)
                                 .then((value) {
                               setState(() {
                                 commentController.text = '';

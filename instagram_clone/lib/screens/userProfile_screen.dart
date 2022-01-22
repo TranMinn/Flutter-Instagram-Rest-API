@@ -1,8 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:instagram_clone/models/User.dart';
+import 'package:instagram_clone/models/MyUserData.dart';
 import 'package:instagram_clone/view_models/userProfile_viewModel.dart';
 import 'package:instagram_clone/widgets/loading_widget.dart';
 
@@ -10,7 +9,8 @@ import '../color_constants.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String username;
-  const UserProfileScreen({Key? key, required this.username}) : super(key: key);
+  final String currentUsername, currentUserPassword;
+  UserProfileScreen({Key? key, required this.username, required this.currentUsername, required this.currentUserPassword}) : super(key: key);
 
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
@@ -18,7 +18,7 @@ class UserProfileScreen extends StatefulWidget {
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   UserProfileViewModel userProfileViewModel = UserProfileViewModel();
-  final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+  // final currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
   int selectedIndex = 0;
   int noOfPosts = 0;
@@ -29,14 +29,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     Size size = MediaQuery.of(context).size;
 
     return FutureBuilder<MyUserData?>(
-        future: userProfileViewModel.fetchCurrentUser(),
+        future: userProfileViewModel.fetchUserByUsername(widget.username),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return LoadingWidget();
           }
 
           final MyUserData? myUserData = snapshot.data;
-          isFollowing = myUserData!.followers!.contains(currentUserId);
+          // isFollowing = myUserData!.followers!.contains(currentUserId);
 
           return Scaffold(
             appBar: AppBar(
@@ -51,7 +51,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 onPressed: () => Navigator.pop(context),
               ),
               title: Text(
-                myUserData.username ?? '',
+                myUserData?.username ?? '',
                 style: TextStyle(color: Colors.black),
               ),
               actions: [
@@ -86,9 +86,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                       shape: BoxShape.circle,
                                       border: Border.all(width: 1, color: grey),
                                       image: DecorationImage(
-                                          image: myUserData.profile_pic!.isNotEmpty
+                                          image: myUserData!
+                                                  .profilePic!.isNotEmpty
                                               ? NetworkImage(
-                                                  myUserData.profile_pic ?? '')
+                                                  myUserData.profilePic ?? '')
                                               : const AssetImage(
                                                       'assets/icons/default_profile_image.jpg')
                                                   as ImageProvider,
@@ -122,7 +123,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   Column(
                                     children: [
                                       Text(
-                                        "${myUserData.followers?.length}",
+                                        "${myUserData.numberOfFollowers}",
                                         style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold),
@@ -137,7 +138,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   Column(
                                     children: [
                                       Text(
-                                        "${myUserData.following?.length}",
+                                        "${myUserData.numberOfFollowing}",
                                         style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold),
@@ -175,7 +176,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                                   onTap: () async {
                                                     await userProfileViewModel
                                                         .followUser(
-                                                            widget.username)
+                                                            widget.username, widget.currentUsername, widget.currentUserPassword)
                                                         .then((value) =>
                                                             Navigator.pop(
                                                                 context));
@@ -256,8 +257,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 )
                               : GestureDetector(
                                   onTap: () async {
-                                    await userProfileViewModel.followUser(
-                                        widget.username);
+                                    bool followed = await userProfileViewModel
+                                        .followUser(widget.username, widget.currentUsername, widget.currentUserPassword);
+
+                                    setState(() {
+                                      isFollowing = followed;
+                                    });
                                   },
                                   child: Container(
                                     height: 35,
@@ -351,7 +356,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 5),
-                  selectedIndex == 0 ? Container()
+                  selectedIndex == 0
+                      ? Container()
                       // ? StreamBuilder<List<PostData>>(
                       //     stream: userProfileViewModel
                       //         .fetchUserPosts(widget.userId),

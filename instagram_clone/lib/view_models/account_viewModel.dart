@@ -1,22 +1,27 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:instagram_clone/models/User.dart';
-import 'package:instagram_clone/models/UserPost.dart';
-import 'package:instagram_clone/services/auth.dart';
-import 'package:instagram_clone/services/post_services.dart';
+import 'package:instagram_clone/models/MyUserData.dart';
 import 'package:instagram_clone/services/user_services.dart';
 
 class AccountViewModel {
   final currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
-  Future<MyUserData?> get fetchCurrentUserData {
-    return UserService().getUserDetails();
+  Future<MyUserData?> fetchCurrentUserData(String username, String password) {
+    return UserService().getUserDetails(username, password);
+  }
+
+  Future<int> fetchFollowers(String username) async {
+    return UserService().getFollowers(username);
+  }
+
+  Future<int> fetchFollowing(String username) async {
+    return UserService().getFollowing(username);
   }
 
   // Stream<List<PostData>> fetchUserPost() {
   //   return PostService().listUserPost(currentUserId!);
   // }
 
-  Future logOut() async {
-    return await AuthService().logOut();
-  }
+  // Future logOut() async {
+  //   return await AuthService().logOut();
+  // }
 }

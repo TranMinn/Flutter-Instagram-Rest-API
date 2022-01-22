@@ -3,6 +3,7 @@ import 'package:instagram_clone/color_constants.dart';
 import 'package:instagram_clone/components/already_have_account_check.dart';
 import 'package:instagram_clone/components/input_field.dart';
 import 'package:instagram_clone/components/text_field_container.dart';
+import 'package:instagram_clone/screens/root_screen.dart';
 import 'package:instagram_clone/screens/sign_up_screen.dart';
 import 'package:instagram_clone/view_models/auth_viewModel.dart';
 import 'package:instagram_clone/view_models/login_viewModel.dart';
@@ -18,15 +19,15 @@ class _LoginScreenState extends State<LoginScreen> {
   AuthViewModel authViewModel = AuthViewModel();
   LoginViewModel loginViewModel = LoginViewModel();
 
-  TextEditingController emailController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    emailController
-        .addListener(() => authViewModel.emailSink.add(emailController.text));
+    usernameController.addListener(
+        () => authViewModel.emailSink.add(usernameController.text));
     passwordController.addListener(
         () => authViewModel.passwordSink.add(passwordController.text));
   }
@@ -89,14 +90,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     StreamBuilder<String>(
                         stream: authViewModel.emailStream,
                         builder: (context, snapshot) {
-
-                            return InputField(
-                              controller: emailController,
-                              obscureText: false,
-                              hintText: 'Phone number , email or username',
-                              errorText: snapshot.data??'',
-                            );
-
+                          return InputField(
+                            controller: usernameController,
+                            obscureText: false,
+                            hintText: 'Phone number , email or username',
+                            errorText: snapshot.data ?? '',
+                          );
                         }),
                     SizedBox(
                       height: size.height * 0.02,
@@ -108,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             controller: passwordController,
                             obscureText: true,
                             hintText: 'Password',
-                            errorText: snapshot.data??'',
+                            errorText: snapshot.data ?? '',
                           );
                         }),
                     SizedBox(
@@ -116,9 +115,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     GestureDetector(
                       onTap: () async {
-                        await loginViewModel.loginUser(
-                            emailController.text, passwordController.text);
-                        print('Logged in');
+                        String token = await loginViewModel.loginUser(
+                            usernameController.text, passwordController.text);
+                        if (token != null) {
+                          print('Logged in');
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RootScreen(username: usernameController.text, password: passwordController.text)));
+                        }
                       },
                       child: const TextFieldContainer(
                         color: buttonBgColor,

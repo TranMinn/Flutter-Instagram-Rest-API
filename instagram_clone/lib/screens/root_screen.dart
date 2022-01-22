@@ -1,14 +1,16 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:instagram_clone/screens/account_screen.dart';
 import 'package:instagram_clone/screens/search_screen.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:instagram_clone/widgets/appBars/homeScreen_appBar.dart';
 import 'package:instagram_clone/widgets/appBars/accountScreen_appBar.dart';
-
-import '../widgets/feed.dart';
+import 'package:instagram_clone/widgets/appBars/homeScreen_appBar.dart';
+import 'package:instagram_clone/widgets/feed.dart';
 
 class RootScreen extends StatefulWidget {
+  final String username, password;
+
+  RootScreen({Key? key, required this.username, required this.password}) : super(key: key);
+
   @override
   _RootScreenState createState() => _RootScreenState();
 }
@@ -29,11 +31,11 @@ class _RootScreenState extends State<RootScreen> {
 
   Widget getBody() {
     List<Widget> screens = [
-      Feed(),
-      SearchScreen(),
+      Feed(username: widget.username, password: widget.password),
+      SearchScreen(currentUsername: widget.username, currentUserPassword: widget.password,),
       Scaffold(),
       Scaffold(),
-      AccountScreen(),
+      AccountScreen(username: widget.username, password: widget.password),
     ];
     return IndexedStack(
       index: pageIndex,
@@ -43,7 +45,7 @@ class _RootScreenState extends State<RootScreen> {
 
   Widget? getAppBar() {
     if (pageIndex == 0) {
-      return HomeScreenAppBar();
+      return HomeScreenAppBar(username: widget.username, password: widget.password,);
       // } else if (pageIndex == 1) {
       //   return AppBar(
       //     title: Text("Search"),
@@ -57,7 +59,7 @@ class _RootScreenState extends State<RootScreen> {
         title: Text("Activity"),
       );
     } else if (pageIndex == 4) {
-      return AccountScreenAppBar();
+      return AccountScreenAppBar(username: widget.username, password: widget.password);
     }
   }
 

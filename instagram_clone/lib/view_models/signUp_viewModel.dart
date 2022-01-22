@@ -1,5 +1,4 @@
-
-import 'package:instagram_clone/models/User.dart';
+import 'package:instagram_clone/models/MyUserData.dart';
 import 'package:instagram_clone/services/auth.dart';
 
 class SignUpViewModel {

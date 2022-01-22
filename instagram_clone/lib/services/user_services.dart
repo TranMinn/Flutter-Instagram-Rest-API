@@ -1,5 +1,7 @@
+import 'dart:io';
+
 import 'package:instagram_clone/global_constants.dart';
-import 'package:instagram_clone/models/User.dart';
+import 'package:instagram_clone/models/MyUserData.dart';
 import 'package:instagram_clone/services/api_services.dart';
 
 class UserService {
@@ -22,51 +24,55 @@ class UserService {
   }
 
   // Get current user
-  Future<MyUserData> getUserDetails() async {
-    final responseBody = await ApiServices.consumeGetOne(API_USER_ME);
+  Future<MyUserData> getUserDetails(String username, String password) async {
+    final responseBody =
+        await ApiServices.consumeGetOneWithCre(API_USER_ME, username, password);
     return MyUserData.fromJson(responseBody);
   }
 
-  // Get list users by username
-  Future<List<MyUserData>> getUserByUsername(String username) async {
-    final String api_username = '$API_USERNAME/$username';
-    final responseBody = await ApiServices.consumeGetAll(api_username);
-    List<MyUserData> listUsers =
-        responseBody.map((dynamic item) => MyUserData.fromJson(item)).toList();
-    return listUsers;
+  // Get user by username
+  Future<MyUserData> getUserByUsername(String username) async {
+    final String api_username = '$API_USER$username/';
+    final responseBody = await ApiServices.consumeGetOne(api_username);
+    return MyUserData.fromJson(responseBody);
   }
 
   // Edit user
-  Future<MyUserData> editUserProfile(
-      String username, String fullName, String bio, String photoUrl) async {
+  Future<MyUserData> editUserProfile(String username, String fullName,
+      String bio, String password) async {
     Map body = {
       'username': username,
       'fullname': fullName,
-      'bio': bio,
-      'photoUrl': photoUrl
+      'bio': bio
     };
 
-    final responseBody = await ApiServices.consumeUpdate(API_USER_ME, body);
+    final responseBody =
+        await ApiServices.consumeUpdateWithCre(API_USER_ME, body, username, password);
     return MyUserData.fromJson(responseBody);
   }
 
+  Future editUserProfilePicture(File pic) async {
+
+  }
+
   // Follow user
-  Future followUser(String username) async {
+  Future<bool> followUser(String username, String currentUsername, String currentUserPassword) async {
     String api_follow = '$MAIN_URL/api/user/$username/follow';
-    await ApiServices.consumeGetOne(api_follow);
+    final response = await ApiServices.consumeGetOneWithCre(api_follow, currentUsername, currentUserPassword);
+    return response['follow'];
   }
 
   // Get Followers
-  Future<Map<String, dynamic>> getFollowers(String username) async {
-    String api_followers = '$MAIN_URL/api/user/$username/get-followers';
+  Future<int> getFollowers(String username) async {
+    String api_followers = '$API_USER$username/get-followers';
     final responseBody = await ApiServices.consumeGetOne(api_followers);
-    return responseBody;
+    return responseBody['count'];
   }
 
   // Get Following
-  Future<Map<String, dynamic>> getFollowing(String username) async {
-    String api_following = '$MAIN_URL/api/user/$username/get-following';
+  Future<int> getFollowing(String username) async {
+    String api_following = '$API_USER$username/get-following';
     final responseBody = await ApiServices.consumeGetOne(api_following);
-    return responseBody;
+    return responseBody['count'];
   }
 }

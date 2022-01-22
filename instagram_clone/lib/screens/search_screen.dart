@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:instagram_clone/models/User.dart';
-import 'package:instagram_clone/models/UserPost.dart';
+import 'package:instagram_clone/models/MyUserData.dart';
+import 'package:instagram_clone/models/PostData.dart';
 import 'package:instagram_clone/screens/userProfile_screen.dart';
 import 'package:instagram_clone/view_models/search_viewModel.dart';
 import 'package:instagram_clone/widgets/loading_widget.dart';
@@ -10,7 +10,12 @@ import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_tile.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+  final String currentUsername, currentUserPassword;
+  const SearchScreen(
+      {Key? key,
+      required this.currentUsername,
+      required this.currentUserPassword})
+      : super(key: key);
 
   @override
   _SearchScreenState createState() => _SearchScreenState();
@@ -63,30 +68,29 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
       body: showUser
-          ? FutureBuilder<List<MyUserData>>(
-              future:
-                  searchViewModel.getUserByUsername(searchController.text),
+          ? FutureBuilder<MyUserData>(
+              future: searchViewModel.getUserByUsername(searchController.text),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return LoadingWidget();
                 }
-                final List<MyUserData>? listUsers = snapshot.data;
-                return ListView.builder(
-                  itemCount: listUsers?.length,
-                  itemBuilder: (context, index) => InkWell(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => UserProfileScreen(
-                                username: listUsers?[index].username ?? ''))),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage:
-                            NetworkImage(listUsers?[index].profile_pic ?? ''),
-                        radius: 16,
-                      ),
-                      title: Text(listUsers?[index].username ?? ''),
+                final searchUser = snapshot.data;
+                return InkWell(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => UserProfileScreen(
+                              username: searchUser?.username ?? '',
+                              currentUsername: widget.currentUsername,
+                              currentUserPassword:
+                                  widget.currentUserPassword))),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage:
+                          NetworkImage(searchUser?.profilePic ?? ''),
+                      radius: 16,
                     ),
+                    title: Text(searchUser?.username ?? ''),
                   ),
                 );
               })
@@ -107,7 +111,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     crossAxisSpacing: 1,
                     itemCount: listPosts?.length,
                     itemBuilder: (context, index) => Image.network(
-                      listPosts?[index].postPhotoUrl ?? '',
+                      listPosts?[index].photo ?? '',
                       fit: BoxFit.cover,
                     ),
                     staggeredTileBuilder: (index) => index % 7 == 0

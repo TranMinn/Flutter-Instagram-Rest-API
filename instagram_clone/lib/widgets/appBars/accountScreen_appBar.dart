@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:instagram_clone/models/User.dart';
+import 'package:instagram_clone/models/MyUserData.dart';
 import 'package:instagram_clone/screens/login_screen.dart';
 import 'package:instagram_clone/screens/upload_image_screen.dart';
 import 'package:instagram_clone/view_models/account_viewModel.dart';
@@ -8,13 +8,16 @@ import 'package:instagram_clone/view_models/account_viewModel.dart';
 import '../loading_widget.dart';
 
 class AccountScreenAppBar extends StatelessWidget {
-  const AccountScreenAppBar({Key? key}) : super(key: key);
+  final String username, password;
+  const AccountScreenAppBar(
+      {Key? key, required this.username, required this.password})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     AccountViewModel accountViewModel = AccountViewModel();
     return FutureBuilder<MyUserData?>(
-        future: accountViewModel.fetchCurrentUserData,
+        future: accountViewModel.fetchCurrentUserData(username, password),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return LoadingWidget();
@@ -50,8 +53,10 @@ class AccountScreenAppBar extends StatelessWidget {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          UploadImageScreen()));
+                                      builder: (context) => UploadImageScreen(
+                                            username: username,
+                                            password: password,
+                                          )));
                             },
                             child: SvgPicture.asset(
                               "assets/icons/upload_icon.svg",
@@ -72,13 +77,18 @@ class AccountScreenAppBar extends StatelessWidget {
                                     return GestureDetector(
                                       onTap: () async {
                                         Navigator.pop(context);
-                                        await AccountViewModel()
-                                            .logOut()
-                                            .then((value) => Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        LoginScreen())));
+                                        // await AccountViewModel()
+                                        //     .logOut()
+                                        //     .then((value) => Navigator.push(
+                                        //         context,
+                                        //         MaterialPageRoute(
+                                        //             builder: (context) =>
+                                        //                 LoginScreen())));
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    LoginScreen()));
 
                                         print('Logged out');
                                       },

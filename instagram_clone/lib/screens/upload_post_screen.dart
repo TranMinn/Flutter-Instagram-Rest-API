@@ -1,19 +1,17 @@
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:instagram_clone/models/User.dart';
-import 'package:instagram_clone/services/user_services.dart';
+import 'package:instagram_clone/models/MyUserData.dart';
+import 'package:instagram_clone/screens/root_screen.dart';
 import 'package:instagram_clone/view_models/account_viewModel.dart';
 import 'package:instagram_clone/view_models/upload_post_viewModel.dart';
 import 'package:instagram_clone/widgets/loading_widget.dart';
-import 'package:instagram_clone/screens/root_screen.dart';
 
 class UploadScreen extends StatefulWidget {
-  final XFile? pickedFile;
+  final File? pickedFile;
+  final String username, password;
 
-  const UploadScreen({Key? key, required this.pickedFile}) : super(key: key);
+  const UploadScreen({Key? key, required this.pickedFile, required this.username, required this.password}) : super(key: key);
 
   @override
   _UploadScreenState createState() => _UploadScreenState();
@@ -28,7 +26,7 @@ class _UploadScreenState extends State<UploadScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<MyUserData?>(
-        future: AccountViewModel().fetchCurrentUserData,
+        future: AccountViewModel().fetchCurrentUserData(widget.username, widget.password),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return LoadingWidget();
@@ -53,16 +51,16 @@ class _UploadScreenState extends State<UploadScreen> {
                 actions: [
                   GestureDetector(
                     onTap: () async {
-                      final String? fileName = widget.pickedFile?.name;
-                      final String? filePath = widget.pickedFile?.path;
+                      // final String? fileName = widget.pickedFile?.name;
+                      // final String? filePath = widget.pickedFile?.path;
 
                       await uploadPostViewModel
-                          .uploadPost(myUserData!, filePath!, fileName!,
-                              captionController.text)
+                          .uploadPost(widget.pickedFile!,
+                              captionController.text, widget.username, widget.password)
                           .then((value) => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => RootScreen())));
+                                  builder: (context) => RootScreen(username: widget.username, password: widget.password,))));
                     },
                     child: const Padding(
                       padding: EdgeInsets.only(right: 10),

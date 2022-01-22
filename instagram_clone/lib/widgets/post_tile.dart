@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:instagram_clone/models/User.dart';
-import 'package:instagram_clone/models/UserPost.dart';
+import 'package:instagram_clone/models/MyUserData.dart';
+import 'package:instagram_clone/models/PostData.dart';
 import 'package:instagram_clone/screens/comment_screen.dart';
+import 'package:instagram_clone/screens/userProfile_screen.dart';
 import 'package:instagram_clone/view_models/postTile_viewModel.dart';
 import 'package:instagram_clone/view_models/account_viewModel.dart';
 
 class PostTile extends StatefulWidget {
   final PostData post;
-  const PostTile({Key? key, required this.post}) : super(key: key);
+  final String username, password;
+  const PostTile(
+      {Key? key,
+      required this.post,
+      required this.username,
+      required this.password})
+      : super(key: key);
 
   @override
   _PostTileState createState() => _PostTileState();
@@ -18,13 +25,25 @@ class _PostTileState extends State<PostTile> {
   PostTileViewModel postTileViewModel = PostTileViewModel();
   AccountViewModel accountViewModel = AccountViewModel();
 
+  late bool isLiked;
+  late int noOfLikes;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    noOfLikes = widget.post.numberOfLikes!;
+    isLiked = widget.post.likedByReqUser!;
+  }
+
   @override
   Widget build(BuildContext context) {
     PostData widgetPost = widget.post;
     return FutureBuilder<MyUserData?>(
-        future: accountViewModel.fetchCurrentUserData,
+        future: accountViewModel.fetchCurrentUserData(
+            widget.username, widget.password),
         builder: (context, snapshot) {
-          String? currentUserId = snapshot.data?.userId;
+          int? currentUserId = snapshot.data?.id;
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 20),
@@ -37,26 +56,36 @@ class _PostTileState extends State<PostTile> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            height: 45,
-                            width: 45,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image:
-                                    NetworkImage(widgetPost.postOwnerPhotoUrl!),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => UserProfileScreen(
+                                      username: widgetPost.author!.username!, currentUsername: widget.username, currentUserPassword: widget.password,)));
+                        },
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 45,
+                              width: 45,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                      widgetPost.author!.profilePic!),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            widgetPost.postOwnerName!,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
+                            const SizedBox(width: 10),
+                            Text(
+                              widgetPost.author!.username!,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
                       Image.asset(
                         'assets/icons/menu_vertical.png',
@@ -69,7 +98,7 @@ class _PostTileState extends State<PostTile> {
                   height: 350,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(widgetPost.postPhotoUrl!),
+                      image: NetworkImage(widgetPost.photo ?? ''),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -84,12 +113,17 @@ class _PostTileState extends State<PostTile> {
                           IconButton(
                             splashRadius: 25,
                             onPressed: () async {
-                              await postTileViewModel.likePost(
-                                  widgetPost.postId!,
-                                  currentUserId!,
-                                  widgetPost.likes!);
+                              bool liked = await postTileViewModel.likePost(
+                                  widgetPost.id!,
+                                  widget.username,
+                                  widget.password);
+
+                              setState(() {
+                                isLiked = liked;
+                                isLiked ? noOfLikes++ : noOfLikes--;
+                              });
                             },
-                            icon: widgetPost.likes!.contains(currentUserId)
+                            icon: isLiked
                                 ? SvgPicture.asset(
                                     'assets/icons/loved_icon.svg')
                                 : SvgPicture.asset('assets/icons/love_icon.svg',
@@ -104,6 +138,8 @@ class _PostTileState extends State<PostTile> {
                                 MaterialPageRoute(
                                   builder: (context) => CommentScreen(
                                     postData: widgetPost,
+                                    username: widget.username,
+                                    password: widget.password,
                                   ),
                                 )),
                             icon: Image.asset(
@@ -142,19 +178,19 @@ class _PostTileState extends State<PostTile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${widgetPost.likes!.length} likes',
+                        '$noOfLikes likes',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 5),
                       Text.rich(TextSpan(
                         children: [
                           TextSpan(
-                            text: widgetPost.postOwnerName,
+                            text: widgetPost.author!.username,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const TextSpan(text: ' '),
                           TextSpan(
-                              text: widgetPost.caption,
+                              text: widgetPost.text,
                               style: const TextStyle(height: 1.5)),
                         ],
                       )),
@@ -165,8 +201,11 @@ class _PostTileState extends State<PostTile> {
                         onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  CommentScreen(postData: widgetPost),
+                              builder: (context) => CommentScreen(
+                                postData: widgetPost,
+                                username: widget.username,
+                                password: widget.password,
+                              ),
                             )),
                         child: const Text(
                           'View all comments',

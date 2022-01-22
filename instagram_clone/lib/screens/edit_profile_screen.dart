@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/models/User.dart';
+import 'package:instagram_clone/models/MyUserData.dart';
 import 'package:instagram_clone/view_models/edit_profile_viewModel.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final MyUserData myUserData;
-  const EditProfileScreen({Key? key, required this.myUserData})
+  final String password;
+  const EditProfileScreen(
+      {Key? key, required this.myUserData, required this.password})
       : super(key: key);
 
   @override
@@ -18,16 +22,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final usernameController = TextEditingController();
   final bioController = TextEditingController();
 
+  File? newPhoto;
   String? newPhotoUrl;
 
   @override
   void initState() {
     super.initState();
 
-    fullNameController.text = widget.myUserData.fullname!;
-    usernameController.text = widget.myUserData.username!;
-    bioController.text = widget.myUserData.bio!;
-    newPhotoUrl = widget.myUserData.profile_pic!;
+    fullNameController.text = widget.myUserData.fullname ?? '';
+    usernameController.text = widget.myUserData.username ?? '';
+    bioController.text = widget.myUserData.bio ?? '';
+    newPhotoUrl = widget.myUserData.profilePic ?? '';
   }
 
   @override
@@ -52,13 +57,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               await editProfileViewModel
                   .editUserProfile(
                       usernameController.text,
-                  fullNameController.text,
+                      fullNameController.text,
                       bioController.text,
-                      newPhotoUrl!)
+                      widget.password)
                   .then((value) {
                 print('Updated');
                 Navigator.pop(context);
               });
+
+              // newPhotoUrl!,
             },
             child: const Padding(
               padding: EdgeInsets.only(right: 10),
@@ -162,11 +169,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               SimpleDialogOption(
                 child: const Text('New Profile Photo'),
                 onPressed: () async {
-                  await editProfileViewModel.getProfilePhotoUrl().then((value) {
+                  await editProfileViewModel.getProfilePhoto().then((value) {
                     setState(() {
-                      newPhotoUrl = value;
+                      newPhoto = value;
                     });
-                    print(value);
                     Navigator.pop(context);
                   });
                   // Navigator.pop(context);

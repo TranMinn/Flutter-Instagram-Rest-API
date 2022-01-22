@@ -3,8 +3,8 @@ import 'package:instagram_clone/services/post_services.dart';
 
 class PostTileViewModel {
 
-  Future likePost(String postId, String userId, List likes) async {
-    await PostService().likePost(postId, userId, likes);
+  Future<bool> likePost(String postId, String username, String password) async {
+    return await PostService().likePost(postId, username, password);
   }
 
 }

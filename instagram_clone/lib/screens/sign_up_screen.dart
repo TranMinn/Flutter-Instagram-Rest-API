@@ -115,7 +115,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => RootScreen()));
+                                  builder: (context) => RootScreen(username: usernameController.text, password: passwordController.text,)));
                         }
                         print('Signed Up');
                       },

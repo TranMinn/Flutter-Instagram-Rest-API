@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:instagram_clone/models/PostComment.dart';
+import 'package:instagram_clone/models/PostData.dart';
 
 class CommentLine extends StatefulWidget {
-  final PostComment postComment;
+  final Post_comments postComment;
   const CommentLine({Key? key, required this.postComment}) : super(key: key);
 
   @override
@@ -13,14 +13,14 @@ class CommentLine extends StatefulWidget {
 class _CommentLineState extends State<CommentLine> {
   @override
   Widget build(BuildContext context) {
-    PostComment comment = widget.postComment;
+    Post_comments comment = widget.postComment;
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundImage: NetworkImage(comment.userPhotoUrl!),
+            backgroundImage: NetworkImage('http://192.168.50.33:8000${comment.author!.profilePic!}'),
             radius: 18,
           ),
           Expanded(
@@ -34,7 +34,7 @@ class _CommentLineState extends State<CommentLine> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                            text: comment.username,
+                            text: comment.author!.username,
                             style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,

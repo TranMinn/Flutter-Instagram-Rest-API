@@ -3,7 +3,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:instagram_clone/screens/upload_image_screen.dart';
 
 class HomeScreenAppBar extends StatelessWidget {
-  const HomeScreenAppBar({Key? key}) : super(key: key);
+  final String username, password;
+  const HomeScreenAppBar({Key? key, required this.username, required this.password}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,7 @@ class HomeScreenAppBar extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return UploadImageScreen();
+                  return UploadImageScreen(username: username, password: password,);
                 },
               ),
             );
