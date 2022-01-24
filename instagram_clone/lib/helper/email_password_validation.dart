@@ -19,4 +19,11 @@ class EmailPasswordValidation {
     }
     return '';
   }
+
+  static String validateUsername(String username) {
+    if (username == null) {
+      return 'Invalid password!';
+    }
+    return '';
+  }
 }

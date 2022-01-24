@@ -37,11 +37,11 @@ class UserService {
     return MyUserData.fromJson(responseBody);
   }
 
-  // Edit user
-  Future<MyUserData> editUserProfile(String username, String fullName,
-      String bio, String password) async {
+  // Edit user information
+  Future<MyUserData> editUserProfile(String newUsername, String fullName,
+      String bio,String username, String password) async {
     Map body = {
-      'username': username,
+      'username': newUsername,
       'fullname': fullName,
       'bio': bio
     };
@@ -51,8 +51,15 @@ class UserService {
     return MyUserData.fromJson(responseBody);
   }
 
-  Future editUserProfilePicture(File pic) async {
+  // Edit user profile picture
+  Future editUserProfilePicture(File image, String username, String password) async {
+    String fileName = image.path.split('/').last;
 
+    Map body = {
+      'profile_pic': 'http://192.168.50.33:8000/api/post/$fileName',
+    };
+
+    await ApiServices.consumeUpdateWithCre(API_USER_ME, body, username, password);
   }
 
   // Follow user

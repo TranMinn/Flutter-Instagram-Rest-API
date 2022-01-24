@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
 
     usernameController.addListener(
-        () => authViewModel.emailSink.add(usernameController.text));
+        () => authViewModel.usernameSink.add(usernameController.text));
     passwordController.addListener(
         () => authViewModel.passwordSink.add(passwordController.text));
   }
@@ -88,9 +88,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: size.height * 0.03,
                     ),
                     StreamBuilder<String>(
-                        stream: authViewModel.emailStream,
+                        stream: authViewModel.usernameStream,
                         builder: (context, snapshot) {
-                          return InputField(
+                          return
+                            InputField(
                             controller: usernameController,
                             obscureText: false,
                             hintText: 'Phone number , email or username',

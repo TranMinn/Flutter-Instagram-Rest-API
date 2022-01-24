@@ -26,7 +26,7 @@ class ImageProcessing {
   }
 
   // Pick Photo from Gallery or Camera
-  Future<XFile?> pickPhoto(String action) async {
+  Future<File?> pickPhoto(String action) async {
     var pickedFile;
     action == 'Gallery'
         ? pickedFile =

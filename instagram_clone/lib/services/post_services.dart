@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:instagram_clone/global_constants.dart';
@@ -11,26 +10,31 @@ class PostService {
   // Upload a post
   // photo has type File
   Future<PostData> uploadPost(File image, text, username, password) async {
-    // Map body = {
-    //   'photo': postPhotoUrl,
-    //   'text': text,
-    // };
 
-    // final responseBody = await ApiServices.consumeCreateWithCre(
-    //     API_POST, body, username, password);
-
-    // final responseBody = await ApiServices.consumeCreateWithImage(API_POST, text, image, username, password);
-    // return PostData.fromJson(responseBody);
+    String fileName = image.path.split('/').last;
 
     Map body = {
+      'photo': 'http://192.168.50.33:8000/api/post/$fileName',
       'text': text,
-      'photo': image != null ? base64Encode(image.readAsBytesSync()) : ''
     };
 
     final responseBody = await ApiServices.consumeCreateWithCre(
         API_POST, body, username, password);
 
     return PostData.fromJson(responseBody);
+
+    // final responseBody = await ApiServices.consumeCreateWithImage(API_POST, text, image, username, password);
+    // return PostData.fromJson(responseBody);
+
+    // Map body = {
+    //   'text': text,
+    //   'photo': image != null ? base64Encode(image.readAsBytesSync()) : ''
+    // };
+    //
+    // final responseBody = await ApiServices.consumeCreateWithCre(
+    //     API_POST, body, username, password);
+    //
+    // return PostData.fromJson(responseBody);
   }
 
   // Get list posts feed

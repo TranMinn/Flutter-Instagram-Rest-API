@@ -25,7 +25,7 @@ class _PostTileState extends State<PostTile> {
   PostTileViewModel postTileViewModel = PostTileViewModel();
   AccountViewModel accountViewModel = AccountViewModel();
 
-  late bool isLiked;
+  late bool isLiked, liked;
   late int noOfLikes;
 
   @override
@@ -33,7 +33,7 @@ class _PostTileState extends State<PostTile> {
     // TODO: implement initState
     super.initState();
     noOfLikes = widget.post.numberOfLikes!;
-    isLiked = widget.post.likedByReqUser!;
+    // isLiked = widget.post.likedByReqUser!;
   }
 
   @override
@@ -43,7 +43,7 @@ class _PostTileState extends State<PostTile> {
         future: accountViewModel.fetchCurrentUserData(
             widget.username, widget.password),
         builder: (context, snapshot) {
-          int? currentUserId = snapshot.data?.id;
+          // int? currentUserId = snapshot.data?.id;
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 20),
@@ -62,7 +62,7 @@ class _PostTileState extends State<PostTile> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => UserProfileScreen(
-                                      username: widgetPost.author!.username!, currentUsername: widget.username, currentUserPassword: widget.password,)));
+                                      username: widgetPost.author!.username!, currentUsername: widget.username, currentUserPassword: widget.password)));
                         },
                         child: Row(
                           children: [
@@ -113,7 +113,7 @@ class _PostTileState extends State<PostTile> {
                           IconButton(
                             splashRadius: 25,
                             onPressed: () async {
-                              bool liked = await postTileViewModel.likePost(
+                              liked = await postTileViewModel.likePost(
                                   widgetPost.id!,
                                   widget.username,
                                   widget.password);

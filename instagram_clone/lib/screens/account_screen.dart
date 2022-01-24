@@ -63,6 +63,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                               : const AssetImage(
                                                       'assets/icons/default_profile_image.jpg')
                                                   as ImageProvider,
+                                          // image: NetworkImage(myUserData?.profilePic ?? ''),
                                           fit: BoxFit.cover),
                                     ),
                                   ),

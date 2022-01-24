@@ -10,7 +10,12 @@ import '../color_constants.dart';
 class UserProfileScreen extends StatefulWidget {
   final String username;
   final String currentUsername, currentUserPassword;
-  UserProfileScreen({Key? key, required this.username, required this.currentUsername, required this.currentUserPassword}) : super(key: key);
+  UserProfileScreen(
+      {Key? key,
+      required this.username,
+      required this.currentUsername,
+      required this.currentUserPassword})
+      : super(key: key);
 
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
@@ -18,11 +23,10 @@ class UserProfileScreen extends StatefulWidget {
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   UserProfileViewModel userProfileViewModel = UserProfileViewModel();
-  // final currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
   int selectedIndex = 0;
   int noOfPosts = 0;
-  bool isFollowing = false;
+  late bool isFollowing, followed;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +40,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           }
 
           final MyUserData? myUserData = snapshot.data;
-          // isFollowing = myUserData!.followers!.contains(currentUserId);
 
           return Scaffold(
             appBar: AppBar(
@@ -93,6 +96,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                               : const AssetImage(
                                                       'assets/icons/default_profile_image.jpg')
                                                   as ImageProvider,
+                                          // image: NetworkImage(myUserData?.profilePic ?? ''),
                                           fit: BoxFit.cover),
                                     ),
                                   ),
@@ -174,12 +178,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                               builder: (context) {
                                                 return GestureDetector(
                                                   onTap: () async {
-                                                    await userProfileViewModel
+                                                    followed = await userProfileViewModel
                                                         .followUser(
-                                                            widget.username, widget.currentUsername, widget.currentUserPassword)
-                                                        .then((value) =>
-                                                            Navigator.pop(
-                                                                context));
+                                                            widget.username,
+                                                            widget
+                                                                .currentUsername,
+                                                            widget
+                                                                .currentUserPassword);
+
+                                                    setState(() {
+                                                      isFollowing = followed;
+                                                    });
+
+                                                    Navigator.pop(context);
                                                   },
                                                   child: Container(
                                                     padding: const EdgeInsets
@@ -257,8 +268,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 )
                               : GestureDetector(
                                   onTap: () async {
-                                    bool followed = await userProfileViewModel
-                                        .followUser(widget.username, widget.currentUsername, widget.currentUserPassword);
+                                    followed =
+                                        await userProfileViewModel.followUser(
+                                            widget.username,
+                                            widget.currentUsername,
+                                            widget.currentUserPassword);
 
                                     setState(() {
                                       isFollowing = followed;

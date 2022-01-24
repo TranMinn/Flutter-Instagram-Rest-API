@@ -59,8 +59,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       usernameController.text,
                       fullNameController.text,
                       bioController.text,
+                      widget.myUserData.username!,
                       widget.password)
-                  .then((value) {
+                  .then((value) async {
+                if (newPhoto != null) {
+                  await editProfileViewModel.editUserProfilePicture(
+                      newPhoto!, widget.myUserData.username!, widget.password);
+                }
+
                 print('Updated');
                 Navigator.pop(context);
               });

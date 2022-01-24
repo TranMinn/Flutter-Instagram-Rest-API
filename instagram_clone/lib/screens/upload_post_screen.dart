@@ -60,7 +60,7 @@ class _UploadScreenState extends State<UploadScreen> {
                           .then((value) => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => RootScreen(username: widget.username, password: widget.password,))));
+                                  builder: (context) => RootScreen(username: widget.username, password: widget.password))));
                     },
                     child: const Padding(
                       padding: EdgeInsets.only(right: 10),

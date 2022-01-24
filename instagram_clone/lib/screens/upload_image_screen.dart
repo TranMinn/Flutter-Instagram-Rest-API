@@ -17,7 +17,8 @@ class UploadImageScreen extends StatefulWidget {
 class _UploadImageScreenState extends State<UploadImageScreen> {
 
   ImageProcessing imageProcessing = ImageProcessing();
-  XFile? pickedFile;
+  // XFile? pickedFile;
+  File? pickedFile;
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +42,12 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => UploadScreen(
-                            pickedFile: File(pickedFile!.path), username: widget.username, password: widget.password,
-                          )));
+                    // pickedFile: File(pickedFile!.path), username: widget.username, password: widget.password,
+
+                  builder: (context) => UploadScreen(
+                        pickedFile: pickedFile, username: widget.username, password: widget.password,
+
+                      )));
             },
             child: const Padding(
               padding: EdgeInsets.only(right: 10),
