@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram_clone/models/MyUserData.dart';
 import 'package:instagram_clone/models/PostData.dart';
 import 'package:instagram_clone/screens/comment_screen.dart';
+import 'package:instagram_clone/screens/likes_screen.dart';
 import 'package:instagram_clone/screens/userProfile_screen.dart';
 import 'package:instagram_clone/view_models/postTile_viewModel.dart';
 import 'package:instagram_clone/view_models/account_viewModel.dart';
@@ -25,7 +26,8 @@ class _PostTileState extends State<PostTile> {
   PostTileViewModel postTileViewModel = PostTileViewModel();
   AccountViewModel accountViewModel = AccountViewModel();
 
-  late bool isLiked, liked;
+  bool isLiked = false;
+  late bool liked;
   late int noOfLikes;
 
   @override
@@ -62,7 +64,9 @@ class _PostTileState extends State<PostTile> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => UserProfileScreen(
-                                      username: widgetPost.author!.username!, currentUsername: widget.username, currentUserPassword: widget.password)));
+                                      username: widgetPost.author!.username!,
+                                      currentUsername: widget.username,
+                                      currentUserPassword: widget.password)));
                         },
                         child: Row(
                           children: [
@@ -177,9 +181,17 @@ class _PostTileState extends State<PostTile> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '$noOfLikes likes',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      GestureDetector(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LikesScreen(
+                                      postId: widgetPost.id!,
+                                    ))),
+                        child: Text(
+                          '$noOfLikes likes',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                       const SizedBox(height: 5),
                       Text.rich(TextSpan(

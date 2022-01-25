@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:instagram_clone/color_constants.dart';
 import 'package:instagram_clone/models/MyUserData.dart';
 import 'package:instagram_clone/screens/edit_profile_screen.dart';
+import 'package:instagram_clone/screens/follows_screen.dart';
 import 'package:instagram_clone/view_models/account_viewModel.dart';
 import 'package:instagram_clone/widgets/loading_widget.dart';
 
@@ -20,11 +21,13 @@ class _AccountScreenState extends State<AccountScreen> {
   AccountViewModel accountViewModel = AccountViewModel();
   int selectedIndex = 0;
   int noOfPosts = 0;
+  int followers = 0;
+  int following = 0;
+
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    // return Scaffold();
     return FutureBuilder<MyUserData?>(
         future: accountViewModel.fetchCurrentUserData(
             widget.username, widget.password),
@@ -93,16 +96,31 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ),
                                   Column(
                                     children: [
-                                      FutureBuilder<int>(
+                                      FutureBuilder<Map<String, dynamic>>(
                                           future:
                                               accountViewModel.fetchFollowers(
                                                   myUserData.username ?? ''),
                                           builder: (context, snapshot) {
-                                            return Text(
-                                              "${snapshot.data ?? '0'}",
-                                              style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold),
+
+                                            Map<String, dynamic>? result = snapshot.data;
+                                            followers = result?['count'];
+
+                                            return GestureDetector(
+                                              onTap: () => Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          FollowsScreen(
+                                                            username: myUserData
+                                                                .username!, followers: followers, following: following,
+                                                          ))),
+                                              child: Text(
+                                                followers.toString(),
+                                                style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
                                             );
                                           }),
                                       const Text(
@@ -114,16 +132,30 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ),
                                   Column(
                                     children: [
-                                      FutureBuilder<int>(
+                                      FutureBuilder<Map<String, dynamic>>(
                                           future:
                                               accountViewModel.fetchFollowing(
                                                   myUserData.username ?? ''),
                                           builder: (context, snapshot) {
-                                            return Text(
-                                              "${snapshot.data ?? '0'}",
-                                              style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold),
+                                            Map<String, dynamic>? result = snapshot.data;
+                                            following = result?['count'];
+
+                                            return GestureDetector(
+                                              onTap: () => Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          FollowsScreen(
+                                                            username: myUserData
+                                                                .username!, followers: followers, following: following
+                                                          ))),
+                                              child: Text(
+                                                following.toString(),
+                                                style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
                                             );
                                           }),
                                       const Text(

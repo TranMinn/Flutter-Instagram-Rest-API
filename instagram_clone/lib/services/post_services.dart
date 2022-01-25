@@ -9,37 +9,25 @@ import 'package:instagram_clone/services/api_services.dart';
 class PostService {
   // Upload a post
   // photo has type File
-  Future<PostData> uploadPost(File image, text, username, password) async {
+  Future<PostData> uploadPost(String imagePath, text, username, password) async {
 
-    String fileName = image.path.split('/').last;
-
-    Map body = {
-      'photo': 'http://192.168.50.33:8000/api/post/$fileName',
-      'text': text,
-    };
-
-    final responseBody = await ApiServices.consumeCreateWithCre(
-        API_POST, body, username, password);
-
+    final responseBody = await ApiServices.consumeCreateWithImage(API_POST, text, imagePath, username, password);
     return PostData.fromJson(responseBody);
 
-    // final responseBody = await ApiServices.consumeCreateWithImage(API_POST, text, image, username, password);
-    // return PostData.fromJson(responseBody);
-
-    // Map body = {
-    //   'text': text,
-    //   'photo': image != null ? base64Encode(image.readAsBytesSync()) : ''
-    // };
-    //
-    // final responseBody = await ApiServices.consumeCreateWithCre(
-    //     API_POST, body, username, password);
-    //
-    // return PostData.fromJson(responseBody);
   }
 
-  // Get list posts feed
+  // Get all posts
   Future<List<PostData>> getListPosts() async {
     final responseBody = await ApiServices.consumeGetAll(API_POST);
+    List<PostData> listPosts = (responseBody['results'] as List)
+        .map((item) => PostData.fromJson(item))
+        .toList();
+    return listPosts;
+  }
+
+  // Get list of feed posts
+  Future<List<PostData>> getListFeedPosts(String username, String password) async {
+    final responseBody = await ApiServices.consumeGetOneWithCre(API_POST, username, password);
     List<PostData> listPosts = (responseBody['results'] as List)
         .map((item) => PostData.fromJson(item))
         .toList();
@@ -88,10 +76,11 @@ class PostService {
   }
 
   // Get likers
-  Future<MyUserData> getLikers(String postId) async {
+  Future<List<MyUserData>> getLikers(String postId) async {
     final String apiUrl = '$API_POST$postId/get-likers/';
 
     final response = await ApiServices.consumeGetOne(apiUrl);
-    return MyUserData.fromJson(response['results']);
+    List<MyUserData> listLikers = (response['results'] as List).map((user) => MyUserData.fromJson(user)).toList();
+    return listLikers;
   }
 }

@@ -19,7 +19,7 @@ class _FeedState extends State<Feed> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<PostData>>(
-        future: feedViewModel.fetchListPost,
+        future: feedViewModel.fetchListFeedPosts(widget.username, widget.password),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData) {
             return LoadingWidget();

@@ -6,7 +6,7 @@ import 'package:instagram_clone/services/user_services.dart';
 
 class EditProfileViewModel {
   Future<File> getProfilePhoto() async {
-    File? pickedFile = await ImageProcessing().pickPhoto('Gallery');
+    XFile? pickedFile = await ImageProcessing().pickPhoto('Gallery');
     final filePath = pickedFile?.path;
     // final fileName = pickedFile?.name;
     //
@@ -25,7 +25,7 @@ class EditProfileViewModel {
 
   // Update User profile picture
   Future editUserProfilePicture(
-      File image, String username, String password) async {
-    await UserService().editUserProfilePicture(image, username, password);
+      String imagePath, String username, String password) async {
+    await UserService().editUserProfilePicture(imagePath, username, password);
   }
 }

@@ -1,14 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:instagram_clone/models/MyUserData.dart';
 import 'package:instagram_clone/screens/root_screen.dart';
+import 'package:instagram_clone/services/post_services.dart';
 import 'package:instagram_clone/view_models/account_viewModel.dart';
 import 'package:instagram_clone/view_models/upload_post_viewModel.dart';
 import 'package:instagram_clone/widgets/loading_widget.dart';
 
 class UploadScreen extends StatefulWidget {
-  final File? pickedFile;
+  final XFile? pickedFile;
   final String username, password;
 
   const UploadScreen({Key? key, required this.pickedFile, required this.username, required this.password}) : super(key: key);
@@ -55,12 +57,15 @@ class _UploadScreenState extends State<UploadScreen> {
                       // final String? filePath = widget.pickedFile?.path;
 
                       await uploadPostViewModel
-                          .uploadPost(widget.pickedFile!,
+                          .uploadPost(widget.pickedFile!.path,
                               captionController.text, widget.username, widget.password)
-                          .then((value) => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RootScreen(username: widget.username, password: widget.password))));
+                          .then((value) {
+                            // await PostService().uploadImagePost(File(widget.pickedFile!.path), widget.username, widget.password);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RootScreen(username: widget.username, password: widget.password)));
+                      } );
                     },
                     child: const Padding(
                       padding: EdgeInsets.only(right: 10),
@@ -86,7 +91,7 @@ class _UploadScreenState extends State<UploadScreen> {
                               image: DecorationImage(
                                   fit: BoxFit.cover,
                                   image: FileImage(
-                                      File(widget.pickedFile!.path)))),
+                                      File(widget.pickedFile?.path ?? '')))),
                         ),
                       ),
                       Expanded(

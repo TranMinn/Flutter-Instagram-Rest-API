@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:instagram_clone/services/post_services.dart';
 
 class UploadPostViewModel {
-  Future uploadPost(File pickedFile,
+  Future uploadPost(String pickedFilePath,
       String text, String username, String password) async {
 
     // take a file to upload via api link
@@ -14,6 +14,6 @@ class UploadPostViewModel {
     // print(postPhotoUrl);
 
     await PostService()
-        .uploadPost(pickedFile, text, username, password);
+        .uploadPost(pickedFilePath, text, username, password);
   }
 }

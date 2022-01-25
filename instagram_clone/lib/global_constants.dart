@@ -1,5 +1,5 @@
 
-const String MAIN_URL = 'http://192.168.50.33:8000';
+const String MAIN_URL = 'http://192.168.50.68:8000';
 
 const String API_REGISTER_USER = '$MAIN_URL/api/user/register/';
 const String API_LOGIN_USER = '$MAIN_URL/api/user/login/';

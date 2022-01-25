@@ -29,7 +29,7 @@ class AccountScreenAppBar extends StatelessWidget {
               automaticallyImplyLeading: false,
               title: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 3, right: 3),
+                  padding: const EdgeInsets.fromLTRB(3, 0, 3, 18),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:instagram_clone/global_constants.dart';
 import 'package:instagram_clone/models/MyUserData.dart';
 import 'package:instagram_clone/services/user_services.dart';

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:instagram_clone/global_constants.dart';
 import 'package:instagram_clone/models/MyUserData.dart';
 import 'package:instagram_clone/services/api_services.dart';
@@ -47,19 +45,15 @@ class UserService {
     };
 
     final responseBody =
-        await ApiServices.consumeUpdateWithCre(API_USER_ME, body, username, password);
+        await ApiServices.consumePatchWithCre(API_USER_ME, body, username, password);
     return MyUserData.fromJson(responseBody);
   }
 
   // Edit user profile picture
-  Future editUserProfilePicture(File image, String username, String password) async {
-    String fileName = image.path.split('/').last;
+  Future editUserProfilePicture(String imagePath, String username, String password) async {
 
-    Map body = {
-      'profile_pic': 'http://192.168.50.33:8000/api/post/$fileName',
-    };
+    return await ApiServices.consumeUpdateWithImage(API_USER_ME, imagePath, username, password);
 
-    await ApiServices.consumeUpdateWithCre(API_USER_ME, body, username, password);
   }
 
   // Follow user
@@ -70,16 +64,16 @@ class UserService {
   }
 
   // Get Followers
-  Future<int> getFollowers(String username) async {
+  Future<Map<String, dynamic>> getFollowers(String username) async {
     String api_followers = '$API_USER$username/get-followers';
     final responseBody = await ApiServices.consumeGetOne(api_followers);
-    return responseBody['count'];
+    return responseBody;
   }
 
   // Get Following
-  Future<int> getFollowing(String username) async {
+  Future<Map<String, dynamic>> getFollowing(String username) async {
     String api_following = '$API_USER$username/get-following';
     final responseBody = await ApiServices.consumeGetOne(api_following);
-    return responseBody['count'];
+    return responseBody;
   }
 }

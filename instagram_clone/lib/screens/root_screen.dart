@@ -9,7 +9,8 @@ import 'package:instagram_clone/widgets/feed.dart';
 class RootScreen extends StatefulWidget {
   final String username, password;
 
-  RootScreen({Key? key, required this.username, required this.password}) : super(key: key);
+  RootScreen({Key? key, required this.username, required this.password})
+      : super(key: key);
 
   @override
   _RootScreenState createState() => _RootScreenState();
@@ -32,7 +33,10 @@ class _RootScreenState extends State<RootScreen> {
   Widget getBody() {
     List<Widget> screens = [
       Feed(username: widget.username, password: widget.password),
-      SearchScreen(currentUsername: widget.username, currentUserPassword: widget.password,),
+      SearchScreen(
+        currentUsername: widget.username,
+        currentUserPassword: widget.password,
+      ),
       Scaffold(),
       Scaffold(),
       AccountScreen(username: widget.username, password: widget.password),
@@ -45,7 +49,10 @@ class _RootScreenState extends State<RootScreen> {
 
   Widget? getAppBar() {
     if (pageIndex == 0) {
-      return HomeScreenAppBar(username: widget.username, password: widget.password,);
+      return HomeScreenAppBar(
+        username: widget.username,
+        password: widget.password,
+      );
       // } else if (pageIndex == 1) {
       //   return AppBar(
       //     title: Text("Search"),
@@ -59,7 +66,8 @@ class _RootScreenState extends State<RootScreen> {
         title: Text("Activity"),
       );
     } else if (pageIndex == 4) {
-      return AccountScreenAppBar(username: widget.username, password: widget.password);
+      return AccountScreenAppBar(
+          username: widget.username, password: widget.password);
     }
   }
 
@@ -102,6 +110,16 @@ class _RootScreenState extends State<RootScreen> {
         ),
       ),
     );
+
+    // return BottomNavigationBar(
+    //     items: const [
+    //       BottomNavigationBarItem(
+    //           icon: Icon(),
+    //           backgroundColor: Colors.green
+    //       ),
+    //     ],
+    //
+    // );
   }
 
   selectedTab(index) {

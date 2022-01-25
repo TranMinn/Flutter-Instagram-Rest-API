@@ -69,6 +69,25 @@ class ApiServices {
     }
   }
 
+  // PATCH WITH CRE
+  static Future<Map<String, dynamic>> consumePatchWithCre(
+      String apiUrl, Map body, String username, String password) async {
+    String encoded = ApiServices.getBasicAuthKey(username, password);
+
+    final http.Response response = await http.patch(Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Basic $encoded'
+        },
+        body: json.encode(body));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to create.');
+    }
+  }
+
   // DELETE WITH CRE
   static Future<void> consumeDelete(
       String apiUrl, String username, String password) async {
@@ -110,6 +129,7 @@ class ApiServices {
         },
         body: json.encode(body));
 
+    print(response.statusCode);
     if (response.statusCode == 201 || response.statusCode == 200) {
       return json.decode(response.body);
     } else {
@@ -118,53 +138,55 @@ class ApiServices {
   }
 
   // Used for create a post
-  // static Future<Map<String, dynamic>> consumeCreateWithImage(String apiUrl,
-  //     String text, File image, String username, String password) async {
-  //   String encoded = ApiServices.getBasicAuthKey(username, password);
-  //
-  //   final request = http.MultipartRequest('POST', Uri.parse(apiUrl));
-  //   final file = await http.MultipartFile.fromPath('photo', image.path);
-  //
-  //   request.fields['text'] = text;
-  //   request.files.add(file);
-  //
-  //   request.headers.addAll({
-  //     'Content-Type': 'multipart/form-data',
-  //     'Authorization': 'Basic $encoded'
-  //   });
-  //
-  //   final streamResponse = await request.send();
-  //   final response = await http.Response.fromStream(streamResponse);
-  //
-  //   print(response.statusCode);
-  //   if (response.statusCode == 201 || response.statusCode == 200) {
-  //     return json.decode(response.body);
-  //   } else {
-  //     throw 'Failed to create with image file.';
-  //   }
-  // }
+  static Future<Map<String, dynamic>> consumeCreateWithImage(String apiUrl,
+      String text, String imagePath, String username, String password) async {
+    String encoded = ApiServices.getBasicAuthKey(username, password);
+
+    final request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+    final file = await http.MultipartFile.fromPath('photo', imagePath);
+
+    request.fields['text'] = text;
+    request.files.add(file);
+
+    request.headers.addAll({
+      'Accept': 'application/json',
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Basic $encoded'
+    });
+
+    final streamResponse = await request.send();
+    final response = await http.Response.fromStream(streamResponse);
+    // final response = streamResponse.reasonPhrase;
+
+    print(response.statusCode);
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw 'Failed to create with image file.';
+    }
+  }
 
   // Update profile image
-  // static Future<Map<String, dynamic>> consumeUpdateWithImage(String apiUrl, File image, String username, String password) async {
-  //   String encoded = ApiServices.getBasicAuthKey(username, password);
-  //
-  //   final request = http.MultipartRequest('PATCH', Uri.parse(apiUrl));
-  //   final file = await http.MultipartFile.fromPath('profile_pic', image.path);
-  //
-  //   request.files.add(file);
-  //
-  //   request.headers.addAll({
-  //     'Content-Type': 'multipart/form-data',
-  //     'Authorization': 'Basic $encoded'
-  //   });
-  //
-  //   final streamResponse = await request.send();
-  //   final response = await http.Response.fromStream(streamResponse);
-  //   if (response.statusCode == 200) {
-  //     return json.decode(response.body);
-  //   } else {
-  //     throw 'Failed to update image file.';
-  //   }
-  // }
+  static Future<Map<String, dynamic>> consumeUpdateWithImage(String apiUrl, String imagePath, String username, String password) async {
+    String encoded = ApiServices.getBasicAuthKey(username, password);
+
+    final request = http.MultipartRequest('PATCH', Uri.parse(apiUrl));
+    final file = await http.MultipartFile.fromPath('profile_pic', imagePath);
+
+    request.files.add(file);
+
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Basic $encoded'
+    });
+
+    final streamResponse = await request.send();
+    final response = await http.Response.fromStream(streamResponse);
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw 'Failed to update image file.';
+    }
+  }
 
 }

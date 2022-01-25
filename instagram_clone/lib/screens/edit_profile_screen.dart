@@ -64,7 +64,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   .then((value) async {
                 if (newPhoto != null) {
                   await editProfileViewModel.editUserProfilePicture(
-                      newPhoto!, widget.myUserData.username!, widget.password);
+                      newPhoto!.path,
+                      widget.myUserData.username!,
+                      widget.password);
                 }
 
                 print('Updated');

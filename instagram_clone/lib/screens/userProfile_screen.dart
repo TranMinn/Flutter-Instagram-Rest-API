@@ -6,6 +6,7 @@ import 'package:instagram_clone/view_models/userProfile_viewModel.dart';
 import 'package:instagram_clone/widgets/loading_widget.dart';
 
 import '../color_constants.dart';
+import 'follows_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String username;
@@ -26,7 +27,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   int selectedIndex = 0;
   int noOfPosts = 0;
-  late bool isFollowing, followed;
+  bool isFollowing = false;
+  late bool followed;
 
   @override
   Widget build(BuildContext context) {
@@ -126,11 +128,25 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   ),
                                   Column(
                                     children: [
-                                      Text(
-                                        "${myUserData.numberOfFollowers}",
-                                        style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold),
+                                      GestureDetector(
+                                        onTap: () => Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    FollowsScreen(
+                                                        username:
+                                                            myUserData
+                                                                .username!,
+                                                        followers: myUserData
+                                                            .numberOfFollowers!,
+                                                        following: myUserData
+                                                            .numberOfFollowing!))),
+                                        child: Text(
+                                          "${myUserData.numberOfFollowers}",
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold),
+                                        ),
                                       ),
                                       const Text(
                                         "Followers",
@@ -141,11 +157,25 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   ),
                                   Column(
                                     children: [
-                                      Text(
-                                        "${myUserData.numberOfFollowing}",
-                                        style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold),
+                                      GestureDetector(
+                                        onTap: () => Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    FollowsScreen(
+                                                        username:
+                                                            myUserData
+                                                                .username!,
+                                                        followers: myUserData
+                                                            .numberOfFollowers!,
+                                                        following: myUserData
+                                                            .numberOfFollowing!))),
+                                        child: Text(
+                                          "${myUserData.numberOfFollowing}",
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold),
+                                        ),
                                       ),
                                       const Text(
                                         "Following",
